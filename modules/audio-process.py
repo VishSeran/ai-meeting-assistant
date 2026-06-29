@@ -1,6 +1,6 @@
 from modules.logger import get_logger
 import requests
-from modules.config import STT_MODEL_NAME
+from modules.config import STT_MODEL_NAME,STT_PIPE
 from transformers import pipeline
 
 logger = get_logger("audio-process-logger")
@@ -44,15 +44,11 @@ def audio_to_text(audio_path, model=STT_MODEL_NAME):
         if not model:
             raise ValueError("Speech to text model is empty or invalid")
 
-        pipe = stt_pipe 
-        
-        if stt_pipe:
-            logger.info("Speech to text pipeline is created")
-        
-        else:
-            raise ValueError("Pipeline error")
-        
-        text = stt_pipe(audio_path, batch_size = 8)["text"]
+        pipe = STT_PIPE 
+        logger.info("Pipeline is assigned")
+    
+        result = pipe(audio_path, batch_size = 8)
+        text = result["text"]
         
         if not text:
             raise ValueError("Result text is empty or none")
