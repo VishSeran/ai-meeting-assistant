@@ -20,8 +20,10 @@ def download_audio (url, filename):
             with open(filename, "wb") as file:
                 file.write(response.content)
                 logger.info("Audio file has created")
+                return file
         else:
             raise ValueError(f"Error in downloading audio: {response.status_code}")
+        
     except Exception as e:
         logger.error(f"Error in download audio: {e}")
         return None
