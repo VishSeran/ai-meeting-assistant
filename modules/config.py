@@ -24,4 +24,14 @@ LLM_MODEL = AutoModelForCausalLM.from_pretrained(LLM_MODEL_ID,
 
 tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_ID)
 
-hf_pipe = HuggingFacePipeline.from_model_id
+
+hf_pipe = pipeline(
+    model_id=LLM_MODEL,
+    task="text-generation",
+    tokenizer=tokenizer,
+    max_new_tokens = 256,
+    temperature=0.7
+)
+
+LLM = HuggingFacePipeline(pipeline=hf_pipe)
+CHAT_LLM = ChatHuggingFace(llm=LLM)
