@@ -1,5 +1,7 @@
 from modules.logger import get_logger
 import requests
+from modules.config import STT_MODEL_NAME
+from transformers import pipeline
 
 logger = get_logger("audio-process-logger")
 
@@ -31,4 +33,17 @@ def download_audio (url, filename):
     except ValueError as e:
         logger.error(f"Value error: {e}")
         return None
+
+def audio_to_text(audio, model=STT_MODEL_NAME):
+    
+    try:
+        
+        
+    except Exception as e:
+        logger.error(f"Error in audio to text: {e}")
+        return None
+    
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None 
 
