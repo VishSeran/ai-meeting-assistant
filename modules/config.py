@@ -1,0 +1,1 @@
+STT_MODEL_NAME = "openai/whisper-tiny.en"
