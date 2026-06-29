@@ -39,7 +39,7 @@ def audio_to_text(audio_path, model=STT_MODEL_NAME):
 
     try:
         if not audio_path:
-            raise ValueError("Audio file not found")
+            raise ValueError("Audio file is not found")
 
         if not model:
             raise ValueError("Speech to text model is empty or invalid")
@@ -63,5 +63,21 @@ def audio_to_text(audio_path, model=STT_MODEL_NAME):
     except Exception as e:
         logger.error(f"Error in audio to text: {e}")
         return None
+    
+def remove_non_ascii(transcript):
+    
+    try:
+        if not transcript:
+            raise ValueError("Transcript is not found")
+        
+        result = "".join(t for t in transcript if ord(t) < 128)
+        return result
+    
+    except ValueError as e:
+        logger.error(f"Value error: {e}")
+        return None
 
+    except Exception as e:
+        logger.error(f"Error in remove non ascii from transcript: {e}")
+        return None
     
