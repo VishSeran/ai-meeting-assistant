@@ -1,5 +1,5 @@
 from modules.logger import get_logger
-from modules.config import LLM_MODEL, CHAT_LLM, CHAIN_LLM
+from modules.config import LLM_MODEL, CHAT_LLM, CHAIN_LLM,OUTPUT_FILENAME
 from modules.audio_process import remove_non_ascii
 from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
@@ -18,8 +18,13 @@ def policy_assistant(transcript):
         logger.info("transcript formatted")
         result = CHAIN_LLM.invoke(input={"context": process_transcript})
         if result:
-            logger.info("results is fetched")       
-            return result
+            logger.info("results is fetched")    
+            logger.info("Started deployment")
+            
+            with open(OUTPUT_FILENAME, "w") as file:
+                file.write(result)
+                   
+            return result, OUTPUT_FILENAME
         else:
             raise ValueError("Result is created unsucessfull")
 

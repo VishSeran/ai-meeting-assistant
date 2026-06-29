@@ -7,6 +7,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 STT_MODEL_NAME = "openai/whisper-tiny.en"
 LLM_MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"
+OUTPUT_FILENAME = "meeting_minutes_and_tasks.txt"
 
 STT_PIPE = pipeline(
     task="automatic-speech-recognition", model=STT_MODEL_NAME, chunk_length_s=30
