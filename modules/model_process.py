@@ -11,14 +11,17 @@ def policy_assistant(transcript):
 
     try:
         
-
         if not transcript:
             raise ValueError("Transcript is not found")
         
         process_transcript = remove_non_ascii(transcript)
-        result = CHAIN_LLM.invoke(process_transcript)
-        
-        return result
+        logger.info("transcript formatted")
+        result = CHAIN_LLM.invoke(input={"context": process_transcript})
+        if result:
+            logger.info("results is fetched")       
+            return result
+        else:
+            raise ValueError("Result is created unsucessfull")
 
     except ValueError as e:
         logger.error(f"Value error: {e}")

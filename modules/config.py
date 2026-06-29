@@ -63,6 +63,6 @@ template = system_prompt + """
             
 PROMPT = PromptTemplate(
     template=template,
-    input_variables=['content'])
+    input_variables=['context'])
         
 CHAIN_LLM = PROMPT | CHAT_LLM | StrOutputParser()
