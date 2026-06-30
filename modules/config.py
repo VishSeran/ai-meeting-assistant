@@ -2,15 +2,21 @@ from transformers import pipeline
 import torch
 from langchain_huggingface import HuggingFacePipeline, ChatHuggingFace
 from transformers import AutoModelForCausalLM, BitsAndBytesConfig, AutoTokenizer
-from langchain_core.prompts import PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import SystemMessage
 
 STT_MODEL_NAME = "openai/whisper-tiny.en"
 LLM_MODEL_ID = "mistralai/Mistral-7B-Instruct-v0.3"
 OUTPUT_FILENAME = "meeting_minutes_and_tasks.txt"
 
+device = 0 if torch.cuda.is_available() else -1
+
 STT_PIPE = pipeline(
-    task="automatic-speech-recognition", model=STT_MODEL_NAME, chunk_length_s=30
+    task="automatic-speech-recognition",
+    model=STT_MODEL_NAME,
+    chunk_length_s=30,
+    device=device,
 )
 
 bits_and_bytes_config = BitsAndBytesConfig(
@@ -20,50 +26,79 @@ bits_and_bytes_config = BitsAndBytesConfig(
     bnb_4bit_compute_dtype=torch.bfloat16,
 )
 
-
-LLM_MODEL = AutoModelForCausalLM.from_pretrained(LLM_MODEL_ID, 
-                                                quantization_config = bits_and_bytes_config,
-                                                device_map = "auto")
-
-tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_ID)
+# tokenizer = AutoTokenizer.from_pretrained(LLM_MODEL_ID)
 
 
-hf_pipe = pipeline(
-    model_id=LLM_MODEL,
+LLM = HuggingFacePipeline.from_model_id(
+    model_id=LLM_MODEL_ID,
     task="text-generation",
-    tokenizer=tokenizer,
-    max_new_tokens = 256,
-    temperature=0.7
+    model_kwargs={"quantization_config": bits_and_bytes_config, "device_map": "auto"},
+    pipeline_kwargs={
+        "temperature": 0.2,
+        "top_p": 0.9,
+        "do_sample": True,
+        "repetition_penalty": 1.15,
+        "return_full_text": False
+    },
 )
 
-LLM = HuggingFacePipeline(pipeline=hf_pipe)
 CHAT_LLM = ChatHuggingFace(llm=LLM)
 
 
-system_prompt = """You are an intelligent assistant specializing in financial products;
-    your task is to process transcripts of earnings calls, ensuring that all references to
-     financial products and common financial terms are in the correct format. For each
-     financial product or common term that is typically abbreviated as an acronym, the full term 
-    should be spelled out followed by the acronym in parentheses. For example, '401k' should be
-     transformed to '401(k) retirement savings plan', 'HSA' should be transformed to 'Health Savings Account (HSA)' , 'ROA' should be transformed to 'Return on Assets (ROA)', 'VaR' should be transformed to 'Value at Risk (VaR)', and 'PB' should be transformed to 'Price to Book (PB) ratio'. Similarly, transform spoken numbers representing financial products into their numeric representations, followed by the full name of the product in parentheses. For instance, 'five two nine' to '529 (Education Savings Plan)' and 'four zero one k' to '401(k) (Retirement Savings Plan)'. However, be aware that some acronyms can have different meanings based on the context (e.g., 'LTV' can stand for 'Loan to Value' or 'Lifetime Value'). You will need to discern from the context which term is being referred to  and apply the appropriate transformation. In cases where numerical figures or metrics are spelled out but do not represent specific financial products (like 'twenty three percent'), these should be left as is. Your role is to analyze and adjust financial product terminology in the text. Once you've done that, produce the adjusted transcript and a list of the words you've changed"""
+system_prompt = """
+You are a financial meeting extraction system.
+
+CRITICAL RULES:
+- Follow format EXACTLY
+- Do NOT repeat any field or label
+- Do NOT create empty lines or blank values
+- If information is missing, write: Not specified
+- Output must be clean and deterministic
+- No extra text allowed outside the format
+- Each bullet must appear only once
+
+OUTPUT FORMAT:
+
+Meeting Summary:
+- Key discussion points: single consolidated bullet list
+- Financial metrics mentioned: only numeric values + metric names
+- Decisions made: only explicit decisions or "Not specified"
+
+Action Items:
+Each item must be in this format:
+Responsible person - Task - Deadline (or Not specified)
+
+Rules:
+- One action per line
+- No repeated “Responsible person” labels
+- Do not split fields across lines
+
+Modified Terms:
+Original → Expanded form
+(If none, write: Not specified)
+"""
+
+user_prompt = """
+Context:
+{context}
+
+"""
 
 
-template = system_prompt + """
-            Generate meeting minutes and a list of tasks based on the provided context.
+PROMPT = ChatPromptTemplate.from_messages(
+    [("system", system_prompt), ("user", user_prompt)]
+)
 
-            Context:
-            {context}
+def clean_output(text):
+    lines = text.split("\n")
+    cleaned = []
+    seen = set()
 
-            Meeting Minutes:
-            - Key points discussed
-            - Decisions made
+    for line in lines:
+        if line.strip() and line not in seen:
+            cleaned.append(line)
+            seen.add(line)
 
-            Task List:
-            - Actionable items with assignees and deadlines
-            """
-            
-PROMPT = PromptTemplate(
-    template=template,
-    input_variables=['context'])
-        
-CHAIN_LLM = PROMPT | CHAT_LLM | StrOutputParser()
+    return "\n".join(cleaned)
+
+CHAIN_LLM = PROMPT | CHAT_LLM | StrOutputParser() | clean_output

@@ -1,8 +1,6 @@
 from modules.logger import get_logger
-from modules.config import LLM_MODEL, CHAT_LLM, CHAIN_LLM,OUTPUT_FILENAME
+from modules.config import CHAIN_LLM,OUTPUT_FILENAME
 from modules.audio_process import remove_non_ascii
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 
 logger = get_logger("model-process logger")
 
@@ -16,6 +14,7 @@ def policy_assistant(transcript):
         
         process_transcript = remove_non_ascii(transcript)
         logger.info("transcript formatted")
+        
         result = CHAIN_LLM.invoke(input={"context": process_transcript})
         if result:
             logger.info("results is fetched")    
