@@ -1,17 +1,19 @@
 Meeting Summary:
 - Key discussion points:
-    - Adoption of a conservative approach to manage leverage
+    - Conservative management of leverage
     - Healthy Tier 1 Capital Ratio of 12.5%
-    - Positive forecast for the coming quarter with expected revenue of around 135 million
-    - Expected 8% quarter over quarter growth driven by blockchain solutions and AI driven predictive analytics
+    - Positive forecast for Q3 with expected revenue of around 135 million
+    - Expected 8% Quarter over Quarter growth driven by blockchain solutions and AI driven predictive analytics
     - Upcoming IPO of FinTech subsidiary Pay Plus aiming to raise 200 million
-    - Anticipated impact on liquidity and potential for aggressive growth strategies
-    - Gratitude towards shareholders for continued faith
-- Financial metrics mentioned:
-    - Tier 1 Capital Ratio: 12.5%
-    - Expected Revenue: 135 million
-- Decisions made: Not specified
+    - Aggressive growth strategies following the IPO
+    - Shareholder appreciation expressed and anticipation for Q3 success
+Financial metrics mentioned:
+- Tier 1 Capital Ratio: 12.5%
+- Revenue: 135 million
+- Quarter over Quarter Growth: 8%
+- Funds raised through IPO: 200 million
+Decisions made: Not specified
 Action Items:
-- CFO - Review and analyze the financial projections based on the new data provided - Before end of week
-- Blockchain Solutions Team - Prepare detailed plan for leveraging AI driven predictive analytics in blockchain solutions - By next Monday
-- M&A Department - Coordinate with Pay Plus team for IPO preparations
+- Finance Department - Review and update financial projections based on new data - End of Q3
+- IT Department - Implement AI driven predictive analytics in all major services - Beginning of Q4
+- M&A Team - Explore potential acquisitions to support
