@@ -5,6 +5,8 @@ An AI-powered meeting companion that transforms audio recordings into structured
 This application combines Speech-to-Text technology with Large Language Models to automate meeting documentation, allowing users to focus on conversations instead of taking notes manually.
 
 ---
+![AI Meeting Assistant Screenshot](ai_meeting_assistant.png)
+---
 
 ## Features
 
